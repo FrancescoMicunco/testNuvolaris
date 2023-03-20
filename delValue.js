@@ -1,11 +1,12 @@
 import { createClient } from "redis";
 
-const client = createClient();
+const client = createClient({ host: "127.0.0.1:6379" });
 
-client.on("error", (err) => console.log("Redis Client Error", err));
+async function main(args) {
+  client.on("error", (err) => console.log("Redis Client Error", err));
+  await client.connect();
+  let key = "address:" + args.name;
 
-await client.connect();
-
-await client.del("key", "salute");
-
-await client.disconnect();
+  const delKey = await client.del(key);
+  return delKey.then((r) => ({ del: r })).catch((err) => ({ error: err }));
+}

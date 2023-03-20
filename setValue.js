@@ -1,26 +1,25 @@
 import { createClient } from "redis";
 
-const client = createClient();
-
-let args = { name: "third_test", company: "NuvolarisIV", phone: "000000" };
+const client = createClient({ host: "127.0.0.1:6379" });
 
 async function main(args) {
-    await client.connect();
+  await client.connect();
 
-    client.on("error", (err) => console.log("Redis Client Error", err));
+  // verifica che non ci siano errori sul client
 
-    let key = "address:" + args.name;
-    let value = JSON.stringify({
-        name: args.name || "",
-        company: args.company || "",
-        phone: args.phone || "",
-    });
+  client.on("error", (err) => console.log("Redis Client Error", err));
 
-    await client.set(key, value);
+  // assegna un valore alla key da settare
+  let key = "address:" + args.name;
 
-    // await client.get(key);
+  // riceve i dati dalla props
+  let value = JSON.stringify({
+    name: args.name || "",
+    company: args.company || "",
+    phone: args.phone || "",
+  });
 
-    await client.disconnect();
+  const setValue = await client.set(key, value);
+
+  return setValue.then((r) => ({ set: r })).catch((err) => ({ error: err }));
 }
-
-main(args);
