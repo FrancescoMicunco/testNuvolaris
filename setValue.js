@@ -1,8 +1,10 @@
-import { createClient } from "redis";
-
-const client = createClient({ host: "127.0.0.1:6379" });
-
 async function main(args) {
+
+  
+ const client = require("redis").createClient({ url: args.redis });
+
+ client.on("error", (err) => console.log("Redis Client Error", err));
+
   await client.connect();
 
   // verifica che non ci siano errori sul client
@@ -19,7 +21,7 @@ async function main(args) {
     phone: args.phone || "",
   });
 
-  const setValue = await client.set(key, value);
-
-  return setValue.then((r) => ({ set: r })).catch((err) => ({ error: err }));
+  return client.set(key, value)
+  .then((r) => ({ "set": r }))
+  .catch((err) => ({ "error": err }));
 }

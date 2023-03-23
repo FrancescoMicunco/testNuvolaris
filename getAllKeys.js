@@ -1,18 +1,16 @@
-import { createClient } from "redis";
-
-const client = createClient({ host: "127.0.0.1:6379" });
-
 async function main(args) {
-  await client.connect();
+  const client = require("redis").createClient({ url: args.redis });
 
   client.on("error", (err) => console.log("Redis Client Error", err));
+ 
+   await client.connect();
 
   let keys = await client.keys("address:*");
 
   return keys.length == 0
-    ? { data: [] }
+    ? { "data": [] }
     : client
         .mGet(keys)
-        .then((r) => ({ data: r.map(JSON.parse) }))
-        .catch((err) => ({ error: err }));
+        .then(r => ({ "data": r.map(JSON.parse) }))
+        .catch((err) => ({ "error": err }));
 }

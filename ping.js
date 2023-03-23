@@ -7,5 +7,5 @@ async function main(args) {
     await client.connect();
   
 
-   return client.ping().then(() => console.log("body", "works")); 
+   return client.ping().then(e =>({"body":e}) ); 
 }
